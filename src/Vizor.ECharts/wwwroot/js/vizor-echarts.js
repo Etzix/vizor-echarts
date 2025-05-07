@@ -169,7 +169,7 @@ window.vizorECharts = {
 
 		// iterate through the options and map all JS functions / external data sources
 		// set the chart options
-		chart.setOption(parsedOptions);
+		chart.setOption(parsedOptions, true);
 
 		// hide the loading animation
 		chart.hideLoading();
@@ -233,6 +233,7 @@ window.vizorECharts = {
 		}
 
 		chart.clear();
+		chart.resize();
 	},
 
 	disposeChart: function (id) {

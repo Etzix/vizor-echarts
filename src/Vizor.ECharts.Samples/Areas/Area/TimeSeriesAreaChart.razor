@@ -1,6 +1,6 @@
 ﻿@using Vizor.ECharts;
 
-<Vizor.ECharts.EChart Options="@options" DataLoader="LoadChartData" Width="800px" Height="400px" OnDatazoom="DatazoomEvent" />
+<Vizor.ECharts.EChart Options="@options" DataLoader="LoadChartData" Width="800px" Height="400px" OnDatazoom="DatazoomEvent" OnChartClick="OnChartClick" @ref=_chart />
 
 <div class="card">
     <div class="card-header">Selection</div>
@@ -38,6 +38,7 @@
 @code {
 
     private EventDatazoom? datazoomData;
+    private EChart _chart;
 
     // roughly based on https://echarts.apache.org/examples/en/editor.html?c=area-time-axis
 
@@ -65,7 +66,7 @@
             YAxis = new()
             {
                 Type = AxisType.Value,
-                BoundaryGap = new(0, "100%")
+                BoundaryGap = new(0, "max")
             },
             DataZoom = new()
             {
@@ -85,7 +86,24 @@
                 {
                     AreaStyle = new() {},
                     ShowSymbol = false,
-                    Smooth = true
+                    Smooth = true,
+                    MarkPoint = new MarkPoint()
+                    {
+                        ItemStyle = new ItemStyle()
+                        {
+                            Opacity = 0.8,
+                            //AreaColor = new Color("#FEB019"),
+                             Color = new Color("#FEB019"),
+                        },
+                        SymbolSize = new NumberArrayOrFunction(40),                        
+                        Data = new() {
+                             new MarkPointData(){
+                                 Name = "Mark",
+                                 Value = 13,
+                                 Coord = new NumberOrStringArray(new NumberOrString(1690950049875), new NumberOrString("max")),                                 
+                             }
+                         }
+                    }
                 }
             }
         };
@@ -105,9 +123,14 @@
         (options.Series![0] as LineSeries)!.Data = values;
     }
 
-    private void DatazoomEvent(EventDatazoom evt)
+    private async Task DatazoomEvent(EventDatazoom evt)
     {
         datazoomData = evt;
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnChartClick(EventParams e)
+    {
+
     }
 }
