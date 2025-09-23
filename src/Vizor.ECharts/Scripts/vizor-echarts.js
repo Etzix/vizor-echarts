@@ -80,7 +80,7 @@
 			// execute the afterLoad function if required
 			if (item.afterLoad != null) {
 				try {
-					const func = new Function('return (' + item.afterLoad + ')')();
+					const func = eval(`(${item.afterLoad})`)
 					data = func(data);
 				} catch (error) {
 					console.log('Failed to execute afterLoad function of external data source');
@@ -100,30 +100,17 @@
 		if (mapOptions == null)
 			return;
 
-		// parse the options - try JSON first, fallback to Function constructor for JavaScript functions
-		var parsedOptions;
-		try {
-			parsedOptions = JSON.parse(mapOptions);
-		} catch (e) {
-			// If JSON parsing fails, it likely contains JavaScript functions
-			parsedOptions = new Function('return (' + mapOptions + ')')();
-		}
+		var parsedOptions = eval('(' + mapOptions + ')');
 		for (item of parsedOptions) {
 			if (vizorECharts.logging) {
 				console.log("MAP");
 				console.log(item);
 			}
-			// Handle both 'mapName' and 'name' properties for compatibility
-			var mapName = item.mapName || item.name;
-			
+
 			if (item.type === "geoJSON") {
-				echarts.registerMap(mapName, { geoJSON: item.geoJSON, specialAreas: item.specialAreas });
+				echarts.registerMap(item.mapName, { geoJSON: item.geoJSON, specialAreas: item.specialAreas });
 			} else if (item.type === "svg") {
-				if (!item.svg) {
-					console.error("SVG content is missing for map:", mapName);
-					continue;
-				}
-				echarts.registerMap(mapName, { svg: item.svg });
+				echarts.registerMap(item.mapName, { svg: item.svg });
 			}
 		}
 	},
@@ -149,14 +136,9 @@
 		// register GEO maps
 		await vizorECharts.registerMaps(chart, mapOptions);
 
-		// parse the options - try JSON first, fallback to Function constructor for JavaScript functions
-		var parsedOptions;
-		try {
-			parsedOptions = JSON.parse(chartOptions);
-		} catch (e) {
-			// If JSON parsing fails, it likely contains JavaScript functions
-			parsedOptions = new Function('return (' + chartOptions + ')')();
-		}
+		// parse the options
+		var parsedOptions = eval('(' + chartOptions + ')');
+
 		if (vizorECharts.logging) {
 			console.log("CHART");
 			console.log(parsedOptions);
@@ -182,14 +164,8 @@
 		// register GEO maps
 		await vizorECharts.registerMaps(chart, mapOptions);
 
-		// parse the options - try JSON first, fallback to Function constructor for JavaScript functions
-		var parsedOptions;
-		try {
-			parsedOptions = JSON.parse(chartOptions);
-		} catch (e) {
-			// If JSON parsing fails, it likely contains JavaScript functions
-			parsedOptions = new Function('return (' + chartOptions + ')')();
-		}
+		// parse the options
+		var parsedOptions = eval('(' + chartOptions + ')');
 
 		// iterate through the options and map all JS functions / external data sources
 		// set the chart options
@@ -229,16 +205,6 @@
 		}
 
 		chart.clear();
-	},
-
-	resizeChart: function (id) {
-		var chart = vizorECharts.charts.get(id);
-		if (chart == null) {
-			console.error("Failed to resize chart " + id);
-			return;
-		}
-
-		chart.resize();
 	},
 
 	disposeChart: function (id) {

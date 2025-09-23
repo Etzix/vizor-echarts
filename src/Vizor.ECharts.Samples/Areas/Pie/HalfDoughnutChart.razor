@@ -35,7 +35,7 @@
 					Label = new()
 					{
 						Show = true,
-						Formatter = "{b} ({d}%)"
+						Formatter = new JavascriptFunction("function (param) { return param.name + ' (' + param.percent * 2 + '%)'; }")
 					},
 					Data = new List<PieSeriesData>()
 					{
